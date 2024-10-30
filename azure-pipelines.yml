@@ -6,8 +6,7 @@
 trigger:
   branches:
     include:
-      - master
-      - 202???
+      - main
   paths:
     exclude:
       - .github
@@ -15,8 +14,7 @@ trigger:
 pr:
   branches:
     include:
-      - master
-      - 202???
+      - main
   paths:
     exclude:
       - .github
@@ -28,13 +26,13 @@ resources:
   - repository: sonic-mgmt
     type: github
     name: audreyadora/sonic-mgmt
-    ref: master
+    ref: main
     endpoint: audreyadora
   - repository: buildimage
     type: github
     name: audreyadora/sonic-as6812-test
     endpoint: audreyadora
-    ref: master
+    ref: main
 
 variables:
 - template: .azure-pipelines/azure-pipelines-repd-build-variables.yml@buildimage
