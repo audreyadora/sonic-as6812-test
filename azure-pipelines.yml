@@ -42,10 +42,7 @@ variables:
 - name: ENABLE_FIPS
   value: y
 - name: BUILD_BRANCH
-  ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
-    value: $(System.PullRequest.TargetBranch)
-  ${{ else }}:
-    value: $(Build.SourceBranchName)
+  value: main
 
 stages:
 
