@@ -1,0 +1,8 @@
+*.pyc
+profiles/*.pyc
+*~
+*.log
+*.pcap
+dist
+build
+*.egg-info

@@ -1,0 +1,46 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+# see EXAMPLES in dpkg-buildflags(1) and read /usr/share/dpkg/*
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/default.mk
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# see ENVIRONMENT in dpkg-buildflags(1)
+# package maintainers to append CFLAGS
+#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# package maintainers to append LDFLAGS
+#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+DOPACKAGES = $(shell dh_listpackages)
+
+CONFIGURE_ARGS = --disable-static
+
+# For Debian jessie, stretch, and buster, and Ubuntu bionic and focal, build
+# Python 2 bindings. This is controlled by the build profile being used.
+ifneq (,$(filter python-swsscommon,$(DOPACKAGES)))
+CONFIGURE_ARGS += --enable-python2
+else
+CONFIGURE_ARGS += --disable-python2
+endif
+
+# Skip compiling classes that depend on libyang
+ifneq (,$(filter noyangmod,$(DEB_BUILD_PROFILES)))
+CONFIGURE_ARGS += --disable-yangmodules
+else
+CONFIGURE_ARGS += --enable-yangmodules
+endif
+
+# main packaging script
+%:
+	dh $@
+
+# dh_make generated override targets
+# This is example for Cmake (See https://bugs.debian.org/641051 )
+override_dh_auto_configure:
+	dh_auto_configure -- $(CONFIGURE_ARGS) $(DEB_CONFIGURE_EXTRA_FLAGS)
+#	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)

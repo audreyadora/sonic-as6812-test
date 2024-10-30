@@ -1,0 +1,486 @@
+package restapi
+
+import (
+    "encoding/json"
+    "net"
+    "strconv"
+    "strings"
+)
+
+type HeartbeatReturnModel struct {
+    ServerVersion   string `json:"server_version,omitempty"`
+    ResetGUID       string `json:"reset_GUID,omitempty"`
+    ResetTime       string `json:"reset_time,omitempty"`
+    RoutesAvailable int    `json:"routes_available,omitempty"`
+}
+
+type ConfigResetStatusModel struct {
+    ResetStatus      string `json:"reset_status,omitempty"`
+}
+
+type BgpProfileModel struct {
+    CommunityId  string `json:"community_id"`
+}
+
+type RouteExpiryTimeModel struct {
+    Time int `json:"time"`
+}
+
+type RouteModel struct {
+    Cmd            string `json:"cmd,omitempty"`
+    IPPrefix       string `json:"ip_prefix"`
+    IfName         string `json:"ifname,omitempty"`
+    NextHopType    string `json:"nexthop_type,omitempty"`
+    NextHop        string `json:"nexthop"`
+    NextHopMonitor string `json:"nexthop_monitor,omitempty"`
+    Primary        string `json:"primary,omitempty"`
+    AdvPrefix      string `json:"adv_prefix,omitempty"`
+    Monitoring     string `json:"monitoring,omitempty"`
+    MACAddress     string `json:"mac_address,omitempty"`
+    Vnid           int    `json:"vnid,omitempty"`
+    Weight         string `json:"weight,omitempty"`
+    Profile        string `json:"profile,omitempty"`
+    Persistent     string `json:"persistent,omitempty"`
+    Error_code     int    `json:"error_code,omitempty"`
+    Error_msg      string `json:"error_msg,omitempty"`
+}
+
+type RouteReturnModel struct {
+    Failed  []RouteModel `json:"failed,omitempty"`
+}
+
+type InterfaceModel struct {
+    AdminState string `json:"admin-state"`
+}
+
+type InterfaceReturnModel struct {
+    Port string         `json:"port"`
+    Attr InterfaceModel `json:"attr"`
+}
+
+type VlanModel struct {
+    Vnet_id  string  `json:"vnet_id,omitempty"`
+    IPPrefix string  `json:"ip_prefix,omitempty"`
+}
+
+type VlanReturnModel struct {
+    VlanID    int         `json:"vlan_id"`
+    Attr      VlanModel   `json:"attr"`
+}
+
+type VlansModel struct {
+    VlanID    int     `json:"vlan_id"`
+    IPPrefix  string  `json:"ip_prefix,omitempty"`
+    Vnet_id   string  `json:"vnet_id,omitempty"`
+}
+
+type VlansReturnModel struct {
+    Attr      []VlansModel  `json:"attr"`
+}
+
+type VlanMemberModel struct {
+    Tagging   string      `json:"tagging_mode"`
+}
+
+type VlanMemberReturnModel struct {
+    VlanID    int              `json:"vlan_id"`
+    If_name   string           `json:"if_name"`
+    Attr      VlanMemberModel  `json:"attr"`
+}
+
+type VlanMembersModel struct {
+    If_name   string           `json:"if_name"`
+    Tagging   string           `json:"tagging_mode"`
+}
+
+type VlanMembersReturnModel struct {
+    VlanID    int                 `json:"vlan_id"`
+    Attr      []VlanMembersModel  `json:"attr"`
+}
+
+type VlanMembersAllReturnModel struct {
+    Attr      []VlanMembersReturnModel  `json:"attr"`
+}
+
+type VlanNeighborReturnModel struct {
+    VlanID    int              `json:"vlan_id"`
+    Ip_addr   string           `json:"ip_addr"`
+}
+
+type VlanNeighborsModel struct {
+    Ip_addr   string           `json:"ip_addr"`
+}
+
+type VlanNeighborsReturnModel struct {
+    VlanID    int                  `json:"vlan_id"`
+    Attr      []VlanNeighborsModel `json:"attr"`
+}
+
+type VlansPerVnetReturnModel struct {
+    Vnet_id   string               `json:"vnet_id,omitempty"`
+    Attr      []VlansPerVnetModel  `json:"attr"`
+}
+
+type VlansPerVnetModel struct {
+    VlanID    int              `json:"vlan_id"`
+    IPPrefix  string           `json:"ip_prefix,omitempty"`
+
+}
+
+type TunnelDecapModel struct {
+    IPAddr string `json:"ip_addr"`
+}
+
+type TunnelDecapReturnModel struct {
+    TunnelType string           `json:"tunnel_type"`
+    Attr       TunnelDecapModel `json:"attr"`
+}
+
+type VnetModel struct {
+    Vnid        int     `json:"vnid"`
+    AdvPrefix   string  `json:"advertise_prefix,omitempty"`
+    OverlayDmac string  `json:"overlay_dmac,omitempty"`
+}
+
+type VnetReturnModel struct {
+    VnetName string   `json:"vnet_id"`
+    Attr VnetModel    `json:"attr"`
+}
+
+type PingRequestModel struct {
+    IpAddress string   `json:"ip_addr"`
+    VnetId string   `json:"vnet_id"`
+    Count string   `json:"count"`
+}
+
+type PingReturnModel struct {
+    PacketsTransmitted string   `json:"packets_transmitted"`
+    PacketsReceived string   `json:"packets_received"`
+    MinRTT string   `json:"min_rtt"`
+    MaxRTT string   `json:"max_rtt"`
+    AvgRTT string   `json:"avg_rtt"`
+}
+
+type ErrorInner struct {
+    Code    int      `json:"code"`
+    SubCode *int     `json:"sub-code,omitempty"`
+    Message string   `json:"message"`
+    Fields  []string `json:"fields,omitempty"`
+    Details string   `json:"details,omitempty"`
+}
+
+type ErrorModel struct {
+    Error ErrorInner `json:"error"`
+}
+
+type MissingValueError struct {
+    Field string
+}
+
+type InvalidFormatError struct {
+    Field   string
+    Message string
+}
+
+func (e *MissingValueError) Error() string {
+    return "JSON missing field: " + (*e).Field
+}
+
+func (e *InvalidFormatError) Error() string {
+    return (*e).Message
+}
+
+func (m *RouteModel) UnmarshalJSON(data []byte) (err error) {
+    required := struct {
+        Cmd            *string `json:"cmd"`
+        IPPrefix       *string `json:"ip_prefix"`
+        IfName         *string `json:"ifname"`
+        NextHopType    *string `json:"nexthop_type"`
+        NextHop        *string `json:"nexthop"`
+        NextHopMonitor *string `json:"nexthop_monitor"`
+        Primary        *string `json:"primary"`
+        AdvPrefix      *string `json:"adv_prefix"`
+        Monitoring     *string `json:"monitoring"`
+        MACAddress     *string `json:"mac_address"`
+        Vnid           int     `json:"vnid"`
+        Weight         *string `json:"weight"`
+        Profile        *string `json:"profile"`
+        Persistent     *string `json:persistent`
+        Error          string  `json:"error"`
+    }{}
+
+    err = json.Unmarshal(data, &required)
+
+    if err != nil {
+        return
+    }
+    
+    if required.Cmd == nil {
+        err = &MissingValueError{"cmd"}
+        return
+    } else if required.IPPrefix == nil {
+        err = &MissingValueError{"ip_prefix"}
+        return
+    } else if required.IfName == nil {
+        if required.NextHop == nil {
+            err = &MissingValueError{"nexthop"}
+            return
+        }
+    } 
+
+    if *required.Cmd != "add" && *required.Cmd != "delete" && *required.Cmd != "append" && *required.Cmd != "remove" {
+        err = &InvalidFormatError{Field: "cmd", Message: "Must be add/delete/append/delete"}
+        return
+    }
+
+    _, _, err = ParseIPBothPrefix(*required.IPPrefix)
+    if err != nil {
+        err = &InvalidFormatError{Field: "ip_prefix", Message: "Invalid IP prefix"}
+        return
+    }
+
+    if required.NextHop != nil {
+        if !strings.Contains(*required.NextHop, ",") && !IsValidIPBoth(*required.NextHop) {
+            err = &InvalidFormatError{Field: "nexthop", Message: "Invalid IP address"}
+            return
+        }
+        m.NextHop = *required.NextHop
+    }
+
+    if required.NextHopMonitor != nil {
+        if !strings.Contains(*required.NextHopMonitor, ",") && !IsValidIPBoth(*required.NextHopMonitor) {
+            err = &InvalidFormatError{Field: "nexthop_monitor", Message: "Invalid IP address"}
+            return
+        }
+        nexthops := strings.Split(m.NextHop, ",")
+        nexthop_mon := strings.Split(*required.NextHopMonitor, ",")
+        if *required.Cmd == "add" && len(nexthops) != len(nexthop_mon) {
+            err = &InvalidFormatError{Field: "nexthop_monitor", Message: "there must be equal number of nexthop(s) and nexthop_monitor(s)"}
+            return            
+        }
+        m.NextHopMonitor = *required.NextHopMonitor
+    }
+
+    if required.Primary != nil {
+        if !strings.Contains(*required.Primary, ",") && !IsValidIPBoth(*required.Primary) {
+            err = &InvalidFormatError{Field: "primary", Message: "Invalid IP address"}
+            return
+        }
+        m.Primary = *required.Primary
+    }
+
+    if required.AdvPrefix != nil {
+        _, _, err = ParseIPBothPrefix(*required.AdvPrefix)
+        if err != nil {
+            err = &InvalidFormatError{Field: "adv_prefix", Message: "Invalid advertisement prefix"}
+            return
+        }
+        m.AdvPrefix = *required.AdvPrefix
+    }
+
+    if required.IfName == nil && required.MACAddress != nil {
+        _, err = net.ParseMAC(*required.MACAddress)
+
+        if err != nil {
+            err = &InvalidFormatError{Field: "mac_address", Message: "Invalid MAC address"}
+            return
+        }
+        m.MACAddress = *required.MACAddress
+    }
+
+    if required.Persistent == nil {
+        m.Persistent = "false"
+    } else {
+        if strings.Contains(*required.Persistent, "true") || strings.Contains(*required.Persistent, "false") {
+            m.Persistent = *required.Persistent
+        } else {
+            err = &InvalidFormatError{Field: "persistent", Message: "must be either true or false"}
+            return             
+        }
+    }
+
+    m.Cmd = *required.Cmd
+    m.IPPrefix = *required.IPPrefix
+    m.Vnid = required.Vnid
+    if required.IfName != nil {
+        m.IfName = *required.IfName
+    }
+    if required.Weight != nil {
+        m.Weight = *required.Weight
+    }
+    if required.Profile != nil {
+        m.Profile = *required.Profile
+    }
+    if required.Monitoring != nil {
+        m.Monitoring = *required.Monitoring
+    }
+    return
+}
+
+func (m *VlanMemberModel) UnmarshalJSON(data []byte) (err error) {
+    required := struct {
+         Tagging   string   `json:"tagging_mode,omitempty"`
+   }{}
+   err = json.Unmarshal(data, &required)
+   if err != nil {
+       return
+   }
+
+   if required.Tagging == "" {
+       required.Tagging = "untagged"
+   } else if required.Tagging != "untagged" && required.Tagging != "tagged" {
+       err = &InvalidFormatError{Field: "tagging_mode", Message: "Invalid tagging_mode, must be tagged/untagged"}
+       return
+   }
+   m.Tagging = required.Tagging
+   return
+}
+
+func (m *VlanModel) UnmarshalJSON(data []byte) (err error) {
+    required := struct {
+         Vnet_id  string  `json:"vnet_id,omitempty"`
+         IPPrefix string  `json:"ip_prefix,omitempty"`
+   }{}
+   err = json.Unmarshal(data, &required)
+   if err != nil {
+       return
+   }
+   m.Vnet_id = required.Vnet_id
+
+   if required.IPPrefix != "" {
+       _, _, err = ParseIPBothPrefix(required.IPPrefix)
+       if err != nil {
+             err = &InvalidFormatError{Field: "ip_prefix", Message: "Invalid IP prefix"}
+             return
+       }
+       m.IPPrefix = required.IPPrefix
+   } else {
+       m.IPPrefix = ""
+   }
+   return
+}
+
+func (m *TunnelDecapModel) UnmarshalJSON(data []byte) (err error) {
+    required := struct {
+        IPAddr *string `json:"ip_addr"`
+    }{}
+
+    err = json.Unmarshal(data, &required)
+
+    if err != nil {
+        return
+    }
+
+    if required.IPAddr == nil {
+        err = &MissingValueError{"ip_addr"}
+        return
+    }
+
+    m.IPAddr = *required.IPAddr
+
+    if !IsValidIPBoth(m.IPAddr) {
+        err = &InvalidFormatError{Field: "ip_addr", Message: "Invalid IPv4 address"}
+        return
+    }
+
+    return
+}
+
+func (m *VnetModel) UnmarshalJSON(data []byte) (err error) {
+    required := struct {
+        Vnid        *int    `json:"vnid"`
+        AdvPrefix   *string `json:"advertise_prefix"`
+        OverlayDmac *string `json:"overlay_dmac"`
+    }{}
+
+    err = json.Unmarshal(data, &required)
+
+    if err != nil {
+        return
+    }
+
+    if required.Vnid == nil {
+        err = &MissingValueError{"vnid"}
+        return
+    }
+
+    if *required.Vnid >= 0x1000000 {
+        err = &InvalidFormatError{Field: "vnid", Message: "vnid must be < 2^24"}
+        return
+    }
+
+    m.Vnid = *required.Vnid
+    if required.AdvPrefix != nil {
+        if strings.Compare(*required.AdvPrefix, "true") == 0 || strings.Compare(*required.AdvPrefix, "false") == 0 {
+            m.AdvPrefix = *required.AdvPrefix
+        } else {
+            err = &InvalidFormatError{Field: "advertise_prefix", Message: "advertise_prefix must be either true or false"}
+        }
+    }
+
+    if required.OverlayDmac != nil {
+        _, err = net.ParseMAC(*required.OverlayDmac)
+        if err != nil {
+            err = &InvalidFormatError{Field: "mac_address", Message: "Invalid MAC address"}
+            return
+        }
+        m.OverlayDmac = *required.OverlayDmac
+    }
+
+    return
+}
+
+func (m *RouteExpiryTimeModel) UnmarshalJSON(data []byte) (err error) {
+    required := struct {
+        Time int `json:"time"`
+    }{}
+
+    err = json.Unmarshal(data, &required)
+
+    if err != nil {
+        return
+    }
+
+    if required.Time < 0 || required.Time > 172800 {
+        err = &InvalidFormatError{Field: "time", Message: "time must be greater than 0 and lesser than or equal to 172800"}
+        return
+    }
+
+    m.Time = required.Time
+    return
+}
+
+func (m *PingRequestModel) UnmarshalJSON(data []byte) (err error) {
+    required := struct {
+        IpAddress *string   `json:"ip_addr"`
+        VnetId    string   `json:"vnet_id"`
+        Count     string   `json:"count"`
+    }{}
+
+    err = json.Unmarshal(data, &required)
+
+    if err != nil {
+        return
+    }
+
+    if required.IpAddress == nil {
+        err = &MissingValueError{"ip_addr"}
+        return
+    }
+    m.IpAddress = *required.IpAddress
+
+    if !IsValidIPBoth(m.IpAddress) {
+        err = &InvalidFormatError{Field: "ip_addr", Message: "Invalid IPv4 address"}
+        return
+    }
+    if required.Count != "" {
+        _,err_count := strconv.Atoi(required.Count)
+	if err_count != nil {
+            err = &InvalidFormatError{Field: "count", Message: "count should be an integer"}
+	    return
+	}
+    }
+    m.VnetId = required.VnetId
+    m.Count = required.Count
+    return
+}

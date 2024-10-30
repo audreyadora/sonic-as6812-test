@@ -1,0 +1,195 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+pr:
+- master
+- 202???
+- 201???
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+    - 202???
+    - 201???
+
+# this part need to be set in UI
+schedules:
+- cron: "0 0 * * 6"
+  displayName: Weekly build
+  branches:
+    include:
+    - master
+    - 202???
+    - 201???
+  always: true
+
+resources:
+  repositories:
+  - repository: sonic-swss
+    type: github
+    name: sonic-net/sonic-swss
+    endpoint: sonic-net
+
+parameters:
+  - name: debian_version
+    type: string
+    default: bullseye
+variables:
+  - name: BUILD_BRANCH
+    ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
+      value: $(System.PullRequest.TargetBranch)
+    ${{ else }}:
+      value: $(Build.SourceBranchName)
+
+stages:
+- stage: Build
+
+  jobs:
+  - template: .azure-pipelines/build-template.yml
+    parameters:
+      arch: amd64
+      sonic_slave: sonic-slave-${{ parameters.debian_version }}
+      swss_common_artifact_name: sonic-swss-common
+      artifact_name: sonic-sairedis
+      syslog_artifact_name: sonic-sairedis.syslog
+      run_unit_test: true
+      archive_gcov: true
+      debian_version: ${{ parameters.debian_version }}
+
+- stage: BuildAsan
+  dependsOn: []
+  jobs:
+  - template: .azure-pipelines/build-template.yml
+    parameters:
+      arch: amd64
+      sonic_slave: sonic-slave-${{ parameters.debian_version }}
+      swss_common_artifact_name: sonic-swss-common
+      artifact_name: sonic-sairedis-asan
+      syslog_artifact_name: sonic-sairedis-asan.syslog
+      asan: true
+      run_unit_test: false
+      archive_gcov: false
+      debian_version: ${{ parameters.debian_version }}
+
+- stage: BuildArm
+  dependsOn: Build
+  condition: succeeded('Build')
+  jobs:
+  - template: .azure-pipelines/build-template.yml
+    parameters:
+      arch: armhf
+      timeout: 180
+      pool: sonicbld-armhf
+      sonic_slave: sonic-slave-${{ parameters.debian_version }}-armhf
+      swss_common_artifact_name: sonic-swss-common.armhf
+      artifact_name: sonic-sairedis.armhf
+      syslog_artifact_name: sonic-sairedis.syslog.armhf
+      debian_version: ${{ parameters.debian_version }}
+
+  - template: .azure-pipelines/build-template.yml
+    parameters:
+      arch: arm64
+      timeout: 180
+      pool: sonicbld-arm64
+      sonic_slave: sonic-slave-${{ parameters.debian_version }}-arm64
+      swss_common_artifact_name: sonic-swss-common.arm64
+      artifact_name: sonic-sairedis.arm64
+      syslog_artifact_name: sonic-sairedis.syslog.arm64
+      debian_version: ${{ parameters.debian_version }}
+
+- stage: BuildBookworm
+  dependsOn: BuildArm
+  condition: succeeded('BuildArm')
+  jobs:
+  - template: .azure-pipelines/build-template.yml
+    parameters:
+      arch: amd64
+      sonic_slave: sonic-slave-bookworm
+      swss_common_artifact_name: sonic-swss-common-bookworm
+      artifact_name: sonic-sairedis-bookworm
+      syslog_artifact_name: sonic-sairedis-bookworm.syslog
+      run_unit_test: true
+      debian_version: ${{ parameters.debian_version }}
+
+  - template: .azure-pipelines/build-template.yml
+    parameters:
+      arch: armhf
+      timeout: 180
+      pool: sonicbld-armhf
+      sonic_slave: sonic-slave-bookworm-armhf
+      swss_common_artifact_name: sonic-swss-common-bookworm.armhf
+      artifact_name: sonic-sairedis-bookworm.armhf
+      syslog_artifact_name: sonic-sairedis-bookworm.syslog.armhf
+      debian_version: ${{ parameters.debian_version }}
+
+  - template: .azure-pipelines/build-template.yml
+    parameters:
+      arch: arm64
+      timeout: 180
+      pool: sonicbld-arm64
+      sonic_slave: sonic-slave-bookworm-arm64
+      swss_common_artifact_name: sonic-swss-common-bookworm.arm64
+      artifact_name: sonic-sairedis-bookworm.arm64
+      syslog_artifact_name: sonic-sairedis-bookworm.syslog.arm64
+      debian_version: ${{ parameters.debian_version }}
+
+- stage: BuildSwss
+  dependsOn: Build
+  condition: succeeded('Build')
+  jobs:
+  - template: .azure-pipelines/build-swss-template.yml
+    parameters:
+      arch: amd64
+      sonic_slave: sonic-slave-${{ parameters.debian_version }}
+      swss_common_artifact_name: sonic-swss-common
+      sairedis_artifact_name: sonic-sairedis
+      syslog_artifact_name: sonic-swss.syslog
+      artifact_name: sonic-swss
+      debian_version: ${{ parameters.debian_version }}
+
+- stage: BuildDocker
+  dependsOn: BuildSwss
+  condition: succeeded('BuildSwss')
+  jobs:
+  - template: .azure-pipelines/build-docker-sonic-vs-template.yml
+    parameters:
+      swss_common_artifact_name: sonic-swss-common
+      sairedis_artifact_name: sonic-sairedis
+      swss_artifact_name: sonic-swss
+      artifact_name: docker-sonic-vs
+
+- stage: BuildDockerAsan
+  dependsOn:
+    - BuildAsan
+    - BuildSwss
+  condition: and(succeeded('BuildAsan'), succeeded('BuildSwss'))
+  jobs:
+  - template: .azure-pipelines/build-docker-sonic-vs-template.yml
+    parameters:
+      swss_common_artifact_name: sonic-swss-common
+      sairedis_artifact_name: sonic-sairedis-asan
+      swss_artifact_name: sonic-swss
+      artifact_name: docker-sonic-vs-asan
+      asan: true
+
+- stage: Test
+  dependsOn: BuildDocker
+  condition: succeeded('BuildDocker')
+  jobs:
+  - template: .azure-pipelines/test-docker-sonic-vs-template.yml
+    parameters:
+      log_artifact_name: log
+
+- stage: TestAsan
+  dependsOn: BuildDockerAsan
+  condition: succeeded('BuildDockerAsan')
+  jobs:
+  - template: .azure-pipelines/test-docker-sonic-vs-template.yml
+    parameters:
+      docker_sonic_vs_name: docker-sonic-vs-asan
+      log_artifact_name: log-asan
+      asan: true

@@ -1,0 +1,46 @@
+{
+  "TRANSCEIVER_INFO|Ethernet0": {
+    "type": "QSFP+",
+    "vendor_rev": "A1",
+    "serial": "SERIAL_NUM",
+    "manufacturer": "VENDOR_NAME",
+    "model": "MODEL_NAME"
+  },
+  "TRANSCEIVER_DOM_SENSOR|Ethernet0": {
+    "temperature": 25.39,
+    "voltage": 3.37,
+    "tx1bias": "N/A",
+    "tx2bias": 4.44,
+    "tx3bias": "inf",
+    "tx4bias": 4.44,
+    "rx1power": "-inf",
+    "rx2power": -0.97,
+    "rx3power": -0.97,
+    "rx4power": -0.97,
+    "tx1power": -5.4,
+    "tx2power": -5.4,
+    "tx3power": -5.4,
+    "tx4power": -5.4
+  },
+  "NEIGH_STATE_TABLE|10.0.0.0": {
+    "state": "Connect"
+  },
+  "NEIGH_STATE_TABLE|10.0.0.2": {
+    "state": "Active"
+  },
+  "NEIGH_STATE_TABLE|10.10.0.0": {
+    "state": "Established"
+  },
+  "NEIGH_STATE_TABLE|fec0::ffff:afa:07": {
+    "state": "Active"
+  },
+  "BUFFER_MAX_PARAM_TABLE|Ethernet0": {
+    "max_queues": "16"
+  },
+  "BUFFER_MAX_PARAM_TABLE|Ethernet4": {
+    "max_queues": "16"
+  },
+  "BUFFER_MAX_PARAM_TABLE|Ethernet24": {
+    "max_queues": "16"
+  }
+}

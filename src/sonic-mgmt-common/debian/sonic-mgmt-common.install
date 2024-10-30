@@ -1,0 +1,14 @@
+# Yang models
+build/yang/*.yang                   usr/models/yang
+build/yang/common/*.yang            usr/models/yang
+build/yang/extensions/*.yang       usr/models/yang
+build/yang/sonic/*.yang             usr/models/yang
+build/yang/sonic/common/*.yang      usr/models/yang
+build/yang/annotations/*.yang       usr/models/yang
+build/transformer/models_list       usr/models/yang
+models/yang/version.xml             usr/models/yang
+
+# CVL files
+build/cvl/schema        usr/sbin
+cvl/conf/cvl_cfg.json   usr/sbin
+

@@ -1,0 +1,15 @@
+*.pyc
+*/__pycache__/
+tests/*.pyc
+tests/__pycache__/
+
+# Distribution / packaging
+build/
+sonic_platform_common.egg-info/
+.cache
+
+# Unit test / coverage reports
+.coverage
+htmlcov/
+coverage.xml
+test-results.xml

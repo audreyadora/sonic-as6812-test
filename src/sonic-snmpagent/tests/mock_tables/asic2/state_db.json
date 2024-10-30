@@ -1,0 +1,17 @@
+{
+  "NEIGH_STATE_TABLE|10.10.0.1": {
+    "state": "Established"
+  },
+  "NEIGH_STATE_TABLE|10.10.0.5": {
+    "state": "Established"
+  },
+  "BUFFER_MAX_PARAM_TABLE|Ethernet-BP16": {
+    "max_queues": "16"
+  },
+  "BUFFER_MAX_PARAM_TABLE|Ethernet-BP20": {
+    "max_queues": "16"
+  },
+  "BUFFER_MAX_PARAM_TABLE|Ethernet40": {
+    "max_queues": "16"
+  }
+}

@@ -1,0 +1,11 @@
+Source: genl-packet
+Section: misc
+Priority: optional
+Maintainer: Don Newton <don.newton@intel.com>
+Build-Depends: debhelper-compat (= 12)
+Standards-Version: 4.5.1
+
+Package:genl-packet-tools
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Contains the .so files for the receive genetlink library and the sniffer.

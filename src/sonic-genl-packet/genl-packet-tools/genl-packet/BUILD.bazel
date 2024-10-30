@@ -1,0 +1,35 @@
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+exports_files(["LICENSE"])
+
+cc_binary(
+    name = "sniffer",
+    srcs = ["sniffer.cc"],
+    deps = [
+	    "//libgenl-packet/genl-packet:genl_packet",
+	    "@com_github_pcapplusplus//:pcap",
+	    "@com_github_gflags_gflags//:gflags", 
+	    "@com_github_google_glog//:glog",
+    ],
+    data = glob(["*.pcap"]),
+)
+
+
+cc_binary(
+    name = "generator",
+    srcs = ["generator.cc"],
+    deps = [
+	    "//libgenl-packet/genl-packet:genl_packet",
+	    "@com_github_pcapplusplus//:pcap",
+	    "@com_github_gflags_gflags//:gflags",
+    ],
+    copts = [
+        "-I",
+        "/usr/include/libnl3/",
+    ],
+    linkopts = [
+        "-lnl-3",
+        "-lnl-genl-3"
+    ],
+)

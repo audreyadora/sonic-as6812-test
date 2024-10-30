@@ -1,0 +1,20 @@
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+exports_files(["LICENSE"])
+
+
+cc_library( 
+    name = "genl_packet",
+    srcs = ["receive_genetlink.cc", ],
+    copts = ["-I/usr/include/libnl3"],
+    linkopts = [
+        "-lnl-3",
+        "-lnl-genl-3"
+    ], 
+    hdrs = ["receive_genetlink.h","uapi/linux/genl-packet.h", "prepare_netlink.h",],
+    deps = [
+       "@com_github_google_glog//:glog",
+    ],
+)
+

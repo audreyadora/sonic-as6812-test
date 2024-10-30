@@ -1,0 +1,54 @@
+module sonic-cablelength {
+	namespace "http://github.com/Azure/sonic-cablelength";
+	prefix scl;
+
+	import sonic-port {
+		prefix prt;
+	}
+
+	organization
+		"SONiC";
+
+	contact
+		"SONiC";
+
+	description
+		"SONIC CABLELENGTH";
+
+	revision 2019-07-02 {
+		description
+			"Initial revision.";
+	}
+
+	container sonic-cablelength {	
+
+		container CABLE_LENGTH {
+
+			list CABLE_LENGTH_LIST {
+				key "name";
+
+				leaf name {
+					type string;
+				}
+
+				list CABLE_LENGTH { //this is list inside list for storing mapping between two fields
+					key "port";
+
+					leaf port {
+						type leafref {
+							path "/prt:sonic-port/prt:PORT/prt:PORT_LIST/prt:ifname";
+						}
+
+					}
+
+					leaf length {
+						type string {
+							pattern "[0-9]?[0-9]m";
+						}
+					}
+				}
+
+			}
+		}
+	}
+}

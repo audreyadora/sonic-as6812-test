@@ -1,0 +1,11 @@
+Source: genl-packet-module
+Section: main
+Priority: extra
+Maintainer: support <don.newton@intel.com>
+Build-Depends: debhelper (>= 8.0.0), bzip2, python3
+Standards-Version: 3.9.3
+
+Package: genl-packet-module
+Architecture: amd64
+Depends: linux-image-5.10.0-12-2-amd64-unsigned
+Description: genl-packet kernel module 

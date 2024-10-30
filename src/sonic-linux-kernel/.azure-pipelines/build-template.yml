@@ -1,0 +1,83 @@
+parameters:
+- name: arch
+  type: string
+  values:
+  - amd64
+  - armhf
+  - arm64
+
+- name: platform
+  type: string
+  values:
+  - vs
+  - pensando
+  default: vs
+
+- name: pool
+  type: string
+  values:
+  - sonicbld-1es
+  - sonicbld_8c
+  - sonicbld-arm64
+  - sonicbld-armhf
+  default: sonicbld-1es
+
+- name: timeout
+  type: number
+  default: 600
+
+- name: sonic_slave
+  type: string
+
+- name: artifact_name
+  type: string
+
+- name: linux_deb_pattern
+  type: string
+
+jobs:
+- job:
+  pool: ${{ parameters.pool }}
+  displayName: ${{ parameters.platform }}-${{ parameters.arch }}
+  timeoutInMinutes: ${{ parameters.timeout }}
+
+  container:
+    image: sonicdev-microsoft.azurecr.io:443/${{ parameters.sonic_slave }}:bookworm
+
+  steps:
+  - checkout: self
+    clean: true
+    displayName: 'Checkout code'  
+  - task: DownloadPipelineArtifact@2
+    inputs:
+      source: specific
+      project: build
+      pipelineId: 499053
+      artifact: ${{ parameters.artifact_name }}
+      runVersion: 'specific'
+      itemPattern: ${{ parameters.linux_deb_pattern }}
+      targetPath: $(Agent.TempDirectory)/
+    displayName: "Download the linux-image artifact from the last build with a different kernel version"
+  - script: |
+      git config --global user.email "lguohan@build.com"
+      git config --global user.name "Guohan Lu"
+      export kernel_procure_method=build
+      cat /proc/cpuinfo
+      CONFIGURED_ARCH=${{ parameters.arch }} CONFIGURED_PLATFORM=${{ parameters.platform }} make
+    displayName: "Compile sonic kernel"
+  - script: |
+      dpkg-deb -x $(Agent.TempDirectory)/${{ parameters.linux_deb_pattern }} $(Agent.TempDirectory)/old
+      dpkg-deb -x $(System.DefaultWorkingDirectory)/${{ parameters.linux_deb_pattern }} $(Agent.TempDirectory)/new
+      pip3 install tabulate
+      python3 $(System.DefaultWorkingDirectory)/.azure-pipelines/kcfg-diff.py \
+              --buildid $(Build.BuildId) \
+              --ref_buildid 499053 \
+              --arch ${{ parameters.arch }} \
+              --old_kcfg $(Agent.TempDirectory)/old/boot/ \
+              --new_kcfg $(Agent.TempDirectory)/new/boot/ \
+              --output $(System.DefaultWorkingDirectory)/kconfig-diff-${{ parameters.platform }}-${{ parameters.arch }}.rst
+      cat $(System.DefaultWorkingDirectory)/kconfig-diff-${{ parameters.platform }}-${{ parameters.arch }}.rst
+    displayName: "Compute the kconfig diff"
+  - publish: $(System.DefaultWorkingDirectory)/
+    artifact: ${{ parameters.artifact_name }}
+    displayName: "Archive sonic kernel debian packages"

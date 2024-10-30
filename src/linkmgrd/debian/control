@@ -1,0 +1,14 @@
+Source: sonic-linkmgrd
+Section: devel
+Priority: optional
+Maintainer: Tamer Ahmed <tamer.ahmed@microsoft.com>
+Build-Depends: debhelper (>= 8.0.0),
+Standards-Version: 3.9.3
+Homepage: https://github.com/Azure/sonic-linkmgrd
+XS-Go-Import-Path: github.com/Azure/sonic-linkmgrd
+
+Package: sonic-linkmgrd
+Architecture: any
+Built-Using: ${misc:Built-Using}
+Depends: ${shlibs:Depends}
+Description: SONiC LINK ManaGeR Daemon (linkmgrd)

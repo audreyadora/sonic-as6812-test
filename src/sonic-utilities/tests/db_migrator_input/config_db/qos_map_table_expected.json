@@ -1,0 +1,34 @@
+{
+    "VERSIONS|DATABASE": {
+        "VERSION": "version_3_0_5"
+    },
+    "PORT_QOS_MAP|Ethernet0": {
+        "dscp_to_tc_map": "AZURE",
+        "pfc_enable": "3,4",
+        "pfcwd_sw_enable": "3,4",
+        "pfc_to_queue_map": "AZURE",
+        "tc_to_pg_map": "AZURE",
+        "tc_to_queue_map": "AZURE"
+    },
+    "PORT_QOS_MAP|Ethernet100": {
+        "dscp_to_tc_map": "AZURE",
+        "pfc_enable": "3,4",
+        "pfcwd_sw_enable": "3,4",
+        "pfc_to_queue_map": "AZURE",
+        "tc_to_pg_map": "AZURE",
+        "tc_to_queue_map": "AZURE"
+    },
+    "PORT_QOS_MAP|Ethernet92": {
+        "dscp_to_tc_map": "AZURE",
+        "pfc_to_queue_map": "AZURE",
+        "tc_to_pg_map": "AZURE",
+        "tc_to_queue_map": "AZURE"
+    },
+    "PORT_QOS_MAP|Ethernet96": {
+        "dscp_to_tc_map": "AZURE",
+        "pfc_to_queue_map": "AZURE",
+        "tc_to_pg_map": "AZURE",
+        "tc_to_queue_map": "AZURE"
+    }
+}
+

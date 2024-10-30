@@ -1,0 +1,192 @@
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            //
+//  Copyright 2019 Broadcom. The term Broadcom refers to Broadcom Inc. and/or //
+//  its subsidiaries.                                                         //
+//                                                                            //
+//  Licensed under the Apache License, Version 2.0 (the "License");           //
+//  you may not use this file except in compliance with the License.          //
+//  You may obtain a copy of the License at                                   //
+//                                                                            //
+//     http://www.apache.org/licenses/LICENSE-2.0                             //
+//                                                                            //
+//  Unless required by applicable law or agreed to in writing, software       //
+//  distributed under the License is distributed on an "AS IS" BASIS,         //
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  //
+//  See the License for the specific language governing permissions and       //
+//  limitations under the License.                                            //
+//                                                                            //
+////////////////////////////////////////////////////////////////////////////////
+
+/*
+Package tlerr defines the errors of the translib library.
+
+The Error() method of the error interface for these functions
+returns the English version, and are only meant for log files.
+
+For message strings that are returned to the users, the localization
+will happen at when the GNMI/REST client's locale is known.
+Hence, it cannot occur here.
+*/
+package tlerr
+
+import (
+	//	"fmt"
+	"github.com/Azure/sonic-mgmt-common/cvl"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
+	//	"errors"
+	//	"strings"
+)
+
+var p *message.Printer
+
+func init() {
+	p = message.NewPrinter(language.English)
+}
+
+// DB errors
+
+type TranslibDBCannotOpen struct {
+}
+
+func (e TranslibDBCannotOpen) Error() string {
+	return p.Sprintf("Translib Redis Error: Cannot open DB")
+}
+
+type TranslibDBNotInit struct {
+}
+
+func (e TranslibDBNotInit) Error() string {
+	return p.Sprintf("Translib Redis Error: DB Not Initialized")
+}
+
+type TranslibRedisClientEntryNotExist struct {
+	Entry string
+}
+
+func (e TranslibRedisClientEntryNotExist) Error() string {
+	return p.Sprintf("Translib Redis Error: Entry does not exist: %s", e.Entry)
+}
+
+type TranslibCVLFailure struct {
+	Code         int
+	CVLErrorInfo cvl.CVLErrorInfo
+}
+
+func (e TranslibCVLFailure) Error() string {
+	return p.Sprintf("Translib Redis Error: CVL Failure: %d: %v", e.Code,
+		e.CVLErrorInfo)
+}
+
+type TranslibTransactionFail struct {
+}
+
+func (e TranslibTransactionFail) Error() string {
+	return p.Sprintf("Translib Redis Error: Transaction Fails")
+}
+
+type TranslibDBSubscribeFail struct {
+}
+
+type TranslibDBScriptFail struct {
+	Description string
+}
+
+func (e TranslibDBScriptFail) Error() string {
+	return p.Sprintf("Translib Redis Error: DB Script Fail: %s", e.Description)
+}
+
+func (e TranslibDBSubscribeFail) Error() string {
+	return p.Sprintf("Translib Redis Error: DB Subscribe Fail")
+}
+
+type TranslibDBInvalidState string
+
+func (e TranslibDBInvalidState) Error() string {
+	return "DB error: " + string(e)
+}
+
+type TranslibSyntaxValidationError struct {
+	StatusCode int   // status code
+	ErrorStr   error // error message
+}
+
+func (e TranslibSyntaxValidationError) Error() string {
+	return p.Sprintf("%s", e.ErrorStr)
+}
+
+type TranslibUnsupportedClientVersion struct {
+	ClientVersion     string
+	ServerVersion     string
+	ServerBaseVersion string
+}
+
+func (e TranslibUnsupportedClientVersion) Error() string {
+	return p.Sprintf("Unsupported client version %s", e.ClientVersion)
+}
+
+type TranslibXfmrRetError struct {
+	XlateFailDelReq bool
+}
+
+func (e TranslibXfmrRetError) Error() string {
+	return p.Sprintf("Translib transformer return %s", e.XlateFailDelReq)
+}
+
+type TranslibDBConnectionReset struct {
+}
+
+func (e TranslibDBConnectionReset) Error() string {
+	return p.Sprintf("Translib Redis Error: DB Connection Reset")
+}
+
+type TranslibDBTxCmdsLim struct {
+}
+
+func (e TranslibDBTxCmdsLim) Error() string {
+	return p.Sprintf("Translib Error: DB Transaction Commands Limit Exceeded")
+}
+
+type DBLockType int
+
+const (
+	DBLockGeneric DBLockType = iota
+	DBLockConfigSession
+)
+
+type TranslibDBLock struct {
+	Type DBLockType
+}
+
+func (e TranslibDBLock) Error() string {
+	return p.Sprintf("Translib Error: DB Resource Lock")
+}
+
+type TranslibDBNotSupported struct {
+	Description string
+}
+
+func (e TranslibDBNotSupported) Error() string {
+	return p.Sprintf("Translib Redis Error: Not Supported: %s", e.Description)
+}
+
+type TranslibTimeoutError struct {
+}
+
+func (e TranslibTimeoutError) Error() string {
+	return p.Sprintf("Translib Timeout Error")
+}
+
+type TranslibInvalidSession struct {
+}
+
+func (e TranslibInvalidSession) Error() string {
+	return p.Sprintf("Translib Invalid Session Error")
+}
+
+type TranslibBusy struct {
+}
+
+func (e TranslibBusy) Error() string {
+	return p.Sprintf("Translib Busy")
+}

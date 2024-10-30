@@ -1,0 +1,169 @@
+#!/usr/bin/env python2
+
+'''
+    syseepromd
+    Syseeprom information gathering daemon for SONiC
+    This daemon will be started during the start phase of pmon container, gathering syseeprom info and write to state DB.
+    It will continue monitoring the state DB for the syseeprom table, if table was deleted, it will write again.
+    With this daemon, show syseeprom CLI will be able to get data from state DB instead of access hw or cache.
+'''
+
+import signal
+import sys
+import threading
+
+from sonic_py_common import daemon_base
+from swsscommon import swsscommon
+
+
+# TODO: Once we no longer support Python 2, we can eliminate this and get the
+# name using the 'name' field (e.g., `signal.SIGINT.name`) starting with Python 3.5
+SIGNALS_TO_NAMES_DICT = dict((getattr(signal, n), n)
+                             for n in dir(signal) if n.startswith('SIG') and '_' not in n)
+
+PLATFORM_SPECIFIC_MODULE_NAME = 'eeprom'
+PLATFORM_SPECIFIC_CLASS_NAME = 'board'
+
+EEPROM_INFO_UPDATE_PERIOD_SECS = 60
+
+ERR_NONE = 0
+ERR_PLATFORM_NOT_SUPPORT = 1
+ERR_FAILED_EEPROM = 2
+ERR_FAILED_UPDATE_DB = 3
+ERR_INVALID_PARAMETER = 4
+ERR_EEPROM_LOAD = 5
+
+EEPROM_TABLE_NAME = 'EEPROM_INFO'
+
+SYSLOG_IDENTIFIER = 'syseepromd'
+
+exit_code = 0
+
+
+class DaemonSyseeprom(daemon_base.DaemonBase):
+    def __init__(self):
+        super(DaemonSyseeprom, self).__init__(SYSLOG_IDENTIFIER)
+
+        # Set minimum logging level to INFO
+        self.set_min_log_priority_info()
+
+        self.stop_event = threading.Event()
+        self.eeprom = None
+        self.eeprom_tbl = None
+
+        # First, try to load the new platform API
+        try:
+            import sonic_platform
+            self.eeprom = sonic_platform.platform.Platform().get_chassis().get_eeprom()
+        except Exception as e:
+            self.log_warning(
+                "Failed to load platform-specific eeprom from sonic_platform package due to {}. Trying deprecated plugin method ...".format(repr(e)))
+
+            # If we didn't successfully load the class from the sonic_platform package, try loading the old plugin
+            try:
+                self.eeprom = self.load_platform_util(PLATFORM_SPECIFIC_MODULE_NAME, PLATFORM_SPECIFIC_CLASS_NAME)
+            except Exception as e:
+                self.log_error("Failed to load platform-specific eeprom from deprecated plugin: {}".format(repr(e)))
+
+        if not self.eeprom:
+            sys.exit(ERR_EEPROM_LOAD)
+
+        # Connect to STATE_DB
+        state_db = daemon_base.db_connect("STATE_DB")
+        self.eeprom_tbl = swsscommon.Table(state_db, EEPROM_TABLE_NAME)
+        self.eepromtbl_keys = []
+
+        # Post system EEPROM info to state DB once at start-up
+        rc = self.post_eeprom_to_db()
+        if rc != ERR_NONE:
+            self.log_error("Failed to post system EEPROM info to database")
+
+    def __del__(self):
+        # Delete all the information from DB
+        self.clear_db()
+
+    def post_eeprom_to_db(self):
+        eeprom_data = self.eeprom.read_eeprom()
+        if eeprom_data is None:
+            self.log_error("Failed to read EEPROM")
+            return ERR_FAILED_EEPROM
+
+        err = self.eeprom.update_eeprom_db(eeprom_data)
+        if err:
+            self.log_error("Failed to update EEPROM info in database")
+            return ERR_FAILED_UPDATE_DB
+
+        self.eepromtbl_keys = self.eeprom_tbl.getKeys()
+
+        return ERR_NONE
+
+    def clear_db(self):
+        if self.eeprom_tbl:
+            keys = self.eeprom_tbl.getKeys()
+            for key in keys:
+                self.eeprom_tbl._del(key)
+
+    def detect_eeprom_table_integrity(self):
+        keys = self.eeprom_tbl.getKeys()
+
+        if len(keys) != len(self.eepromtbl_keys):
+            return False
+
+        for key in self.eepromtbl_keys:
+            if key not in keys:
+                return False
+
+        return True
+
+    # Override signal handler from DaemonBase
+    def signal_handler(self, sig, frame):
+        FATAL_SIGNALS = [signal.SIGINT, signal.SIGTERM]
+        NONFATAL_SIGNALS = [signal.SIGHUP]
+
+        global exit_code
+
+        if sig in FATAL_SIGNALS:
+            self.log_info("Caught signal '{}' - exiting...".format(SIGNALS_TO_NAMES_DICT[sig]))
+            exit_code = 128 + sig  # Make sure we exit with a non-zero code so that supervisor will try to restart us
+            self.stop_event.set()
+        elif sig in NONFATAL_SIGNALS:
+            self.log_info("Caught signal '{}' - ignoring...".format(SIGNALS_TO_NAMES_DICT[sig]))
+        else:
+            self.log_warning("Caught unhandled signal '{}' - ignoring...".format(SIGNALS_TO_NAMES_DICT[sig]))
+
+    # Main daemon logic
+    def run(self):
+        if self.stop_event.wait(EEPROM_INFO_UPDATE_PERIOD_SECS):
+            # We received a fatal signal
+            return False
+
+        rc = self.detect_eeprom_table_integrity()
+        if not rc:
+            self.log_info("System EEPROM table was changed, needs update")
+            self.clear_db()
+            rcs = self.post_eeprom_to_db()
+            if rcs != ERR_NONE:
+                self.log_error("Failed to post EEPROM to database")
+
+        return True
+
+#
+# Main =========================================================================
+#
+
+
+def main():
+    syseepromd = DaemonSyseeprom()
+
+    syseepromd.log_info("Starting up...")
+
+    while syseepromd.run():
+        pass
+
+    syseepromd.log_info("Shutting down...")
+
+    return exit_code
+
+
+if __name__ == '__main__':
+    sys.exit(main())

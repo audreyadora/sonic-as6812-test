@@ -1,0 +1,26 @@
+{{>partial_header}}
+package {{packageName}}
+
+{{#operations}}
+import (
+	"net/http"
+
+	"github.com/Azure/sonic-mgmt-framework/rest/server"
+){{#operation}}
+
+func {{nickname}}(w http.ResponseWriter, r *http.Request) {
+    rc, r := server.GetContext(r)
+    rc.Name = "{{operationId}}"
+    {{#consumes}}
+    rc.Consumes.Add("{{mediaType}}")
+    {{/consumes}}
+    {{#produces}}
+    rc.Produces.Add("{{mediaType}}")
+    {{/produces}}
+    {{#vendorExtensions}}
+    {{#x-params}}
+    rc.PMap = server.NameMap{ {{#varMapping}}"{{uriName}}":"{{yangName}}", {{/varMapping}} }
+    {{/x-params}}
+    {{/vendorExtensions}}
+	server.Process(w, r)
+}{{/operation}}{{/operations}}

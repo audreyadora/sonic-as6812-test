@@ -1,0 +1,49 @@
+module sonic-tc-queue-map {
+	namespace "http://github.com/Azure/sonic-tc-queue-map";
+	prefix tqm;
+
+	organization
+		"SONiC";
+
+	contact
+		"SONiC";
+
+	description
+		"SONIC TC_TO_QUEUE_MAP";
+
+	revision 2019-05-15 {
+		description
+			"Initial revision.";
+	}
+
+	container sonic-tc-queue-map {
+
+		container TC_TO_QUEUE_MAP {
+
+			list TC_TO_QUEUE_MAP_LIST {
+				key "name";
+
+				leaf name {
+					type string;
+				}
+
+				list TC_TO_QUEUE_MAP { //this is list inside list for storing mapping between two fields
+					key "tc_num";
+
+					leaf tc_num {
+						type string {
+							pattern "[0-9]?";
+						}
+					}
+
+					leaf qindex {
+						type string {
+							pattern "[0-9]?";
+						}
+					}
+				}
+
+			}
+		}
+	}
+}

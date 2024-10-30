@@ -1,0 +1,18 @@
+{{>partial_header}}
+package {{packageName}}
+
+import (
+	"github.com/Azure/sonic-mgmt-framework/rest/server"
+)
+
+func init() {
+	{{#apiInfo}}{{#apis}}{{#operations}}{{#operation}}
+	server.AddRoute(
+		"{{operationId}}",
+		"{{httpMethod}}",
+{{{ nosemgrepgrep javascript.express.security.audit.xss.mustache.explicit-unescape.template }}}
+		"{{{path}}}",
+		{{operationId}},
+	)
+	{{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
+}
