@@ -35,8 +35,8 @@ resources:
     ref: main
 
 variables:
-- template: .azure-pipelines/azure-pipelines-repd-build-variables.yml@buildimage
-- template: .azure-pipelines/template-variables.yml@buildimage
+- template: .azure/azure-pipelines-repd-build-variables.yml@buildimage
+- template: .azure/template-variables.yml@buildimage
 - name: CACHE_MODE
   value: rcache
 - name: ENABLE_FIPS
@@ -53,7 +53,7 @@ stages:
   pool: sonicbld-1es
   dependsOn: []
   jobs:
-  - template: .azure-pipelines/azure-pipelines-build.yml
+  - template: .azure/azure-pipelines-build.yml
     parameters:
       buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) ${{ variables.VERSION_CONTROL_OPTIONS }}'
       jobGroups:
