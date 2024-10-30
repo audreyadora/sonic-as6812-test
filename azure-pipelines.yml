@@ -53,8 +53,6 @@ stages:
   pool: sonicbld-1es
   dependsOn: []
   jobs:
-  - checkout: self
-    clean: false
   - template: .azure-pipelines/azure-pipelines-build.yml
     parameters:
       buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) ${{ variables.VERSION_CONTROL_OPTIONS }}'
