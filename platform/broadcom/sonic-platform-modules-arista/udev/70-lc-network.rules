@@ -1,0 +1,1 @@
+SUBSYSTEM=="net",ENV{DEVPATH}=="/devices/pci0000:00/0000:00:03.0/0000:05:00.0/0000:06:*",RUN+="/usr/bin/lc-interface-config $kernel $env{ACTION}"

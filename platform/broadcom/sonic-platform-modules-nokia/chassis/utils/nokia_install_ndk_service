@@ -1,0 +1,66 @@
+#!/bin/bash
+
+devicemgr=0
+qfpgamgr=0
+ethmgr=0
+phymgr=0
+asicthermal=0
+
+source /host/machine.conf
+net_driver_link="/usr/share/sonic/device/${onie_platform}/89-net-by-driver.link"
+if [ -e $net_driver_link ]; then
+    cp $net_driver_link  /etc/systemd/network/.
+fi
+
+if [ -e /lib/systemd/system/nokia-sr-device-mgr.service ]; then
+    systemctl enable nokia-sr-device-mgr.service
+    devicemgr=1
+fi
+if [ -e /lib/systemd/system/nokia-ndk-qfpga-mgr.service ]; then
+    systemctl enable nokia-ndk-qfpga-mgr.service
+    qfpgamgr=1
+fi
+if [ -e /lib/systemd/system/nokia-eth-mgr.service ]; then
+    systemctl enable nokia-eth-mgr.service
+    ethmgr=1
+fi
+
+if [ -e /lib/systemd/system/nokia-phy-mgr.service ]; then
+    systemctl enable nokia-phy-mgr.service
+    phymgr=1
+fi
+
+if [ -e /lib/systemd/system/nokia-asic-thermal.service ]; then
+   ASIC_CONF="/usr/share/sonic/device/${onie_platform}/asic.conf"
+   if [ -e $ASIC_CONF ]; then
+      source $ASIC_CONF
+      num_asic=0
+      while [ $num_asic -lt $NUM_ASIC ]
+      do
+         sed -i "/^Description=.*/a After=syncd@$num_asic.service" /lib/systemd/system/nokia-asic-thermal.service
+	 ((num_asic++))
+      done
+   fi
+   systemctl enable nokia-asic-thermal.service
+   asicthermal=1
+fi
+
+if [[ $devicemgr -eq 1 ]] || [[ $qfpgamgr -eq 1 ]] || [[ $ethmgr -eq 1 ]] || [[ $phymgr -eq 1 ]] || [[ $asicthermal -eq 1 ]]; then
+    systemctl daemon-reload
+fi
+
+if [[ $devicemgr -eq 1 ]]; then 
+    systemctl start nokia-sr-device-mgr.service &
+fi
+if [[ $qfpgamgr -eq 1 ]]; then
+    systemctl start nokia-ndk-qfpga-mgr.service &
+fi
+if [[ $ethmgr -eq 1 ]]; then
+    systemctl start nokia-eth-mgr.service &
+fi
+if [[ $phymgr -eq 1 ]]; then
+    systemctl start nokia-phy-mgr.service &
+fi
+if [[ $asicthermal -eq 1 ]]; then
+    systemctl start nokia-asic-thermal.service &
+fi

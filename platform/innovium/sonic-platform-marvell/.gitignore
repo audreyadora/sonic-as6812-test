@@ -1,0 +1,37 @@
+# Object files
+*.o
+*.ko
+*.obj
+*.o.d
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+
+#platform
+build/
+sonic_platform.egg-info/
+*-none-any.whl
+
+# Debian packaging
+*.debhelper.log
+*.postinst.debhelper
+*.postrm.debhelper
+*.prerm.debhelper
+*.substvars
+debian/.debhelper/
+debian/files
+
+#Python packaging
+*.egg
+.eggs/
+*/.eggs/

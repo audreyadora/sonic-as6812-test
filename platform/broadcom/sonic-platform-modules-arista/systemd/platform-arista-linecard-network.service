@@ -1,0 +1,17 @@
+[Unit]
+Description=Internal networking configuration for Arista linecards
+Before=interfaces-config.service
+Before=database.service
+PartOf=platform-arista.target
+ConditionKernelCommandLine=Aboot
+ConditionKernelCommandLine=sonic.mode=linecard
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+
+ExecStart=-/usr/bin/arista-chassis-network lo
+ExecStart=/usr/bin/lc-interface-config
+
+[Install]
+RequiredBy=platform-arista.target

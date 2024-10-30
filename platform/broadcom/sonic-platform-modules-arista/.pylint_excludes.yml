@@ -1,0 +1,497 @@
+arista/cli/actions/chassis/__init__.py:
+- unused-argument
+arista/cli/actions/chassis/setup.py:
+- unused-argument
+arista/cli/actions/fabric/clean.py:
+- broad-except
+- trailing-newlines
+arista/cli/actions/fabric/power.py:
+- broad-except
+arista/cli/actions/fabric/setup.py:
+- broad-except
+- trailing-newlines
+arista/cli/actions/platform/__init__.py:
+- unused-argument
+arista/cli/actions/platforms.py:
+- unused-argument
+arista/cli/actions/reboot.py:
+- import-outside-toplevel
+- unused-argument
+arista/cli/actions/show/chassis/summary.py:
+- trailing-newlines
+- unused-argument
+arista/cli/actions/show/fabric/environment.py:
+- unused-argument
+arista/cli/actions/show/fabric/status.py:
+- unused-argument
+arista/cli/actions/show/linecard/environment.py:
+- unused-argument
+arista/cli/actions/show/linecard/status.py:
+- unused-argument
+arista/cli/actions/show/platform/environment.py:
+- unused-argument
+arista/cli/actions/show/platform/power.py:
+- unused-argument
+arista/cli/actions/show/platform/reboot_cause.py:
+- unused-argument
+arista/cli/actions/show/platform/xcvr.py:
+- unused-argument
+arista/cli/actions/show/supported.py:
+- abstract-method
+- unused-argument
+arista/cli/actions/syseeprom.py:
+- unused-argument
+arista/cli/actions/watchdog.py:
+- trailing-newlines
+arista/cli/args/chassis/__init__.py:
+- unused-argument
+arista/cli/args/chassis/setup.py:
+- unused-argument
+arista/cli/args/common.py:
+- trailing-newlines
+arista/cli/args/default.py:
+- unused-argument
+arista/cli/args/dump.py:
+- unused-argument
+arista/cli/args/platform/__init__.py:
+- unused-argument
+arista/cli/args/platforms.py:
+- unused-argument
+arista/cli/args/reboot.py:
+- unused-argument
+arista/cli/args/show/chassis/summary.py:
+- unused-argument
+arista/cli/args/show/fabric/environment.py:
+- unused-argument
+arista/cli/args/show/fabric/status.py:
+- unused-argument
+arista/cli/args/show/linecard/environment.py:
+- unused-argument
+arista/cli/args/show/linecard/status.py:
+- unused-argument
+arista/cli/args/show/platform/environment.py:
+- unused-argument
+arista/cli/args/show/platform/power.py:
+- unused-argument
+arista/cli/args/show/platform/xcvr.py:
+- unused-argument
+arista/cli/args/show/supported.py:
+- unused-argument
+arista/cli/args/syseeprom.py:
+- unused-argument
+arista/cli/exception.py:
+- super-init-not-called
+arista/cli/show/__init__.py:
+- bad-indentation
+- import-outside-toplevel
+arista/cli/show/card.py:
+- unused-variable
+arista/cli/show/reboot_cause.py:
+- no-else-return
+arista/cli/show/xcvr.py:
+- unused-variable
+arista/cli/tests/cli_platforms.py:
+- unused-argument
+arista/components/asic/xgs/trident3.py:
+- bad-indentation
+arista/components/cpld.py:
+- arguments-differ
+- arguments-renamed
+- redefined-outer-name
+- undefined-variable
+arista/components/cpu/lorikeet.py:
+- unused-import
+arista/components/cpu/rook.py:
+- unused-import
+arista/components/denali/card.py:
+- abstract-method
+- bad-indentation
+- broad-except
+- not-callable
+- too-many-public-methods
+- unused-import
+arista/components/denali/fabric.py:
+- abstract-method
+- too-many-ancestors
+arista/components/denali/linecard.py:
+- broad-except
+- too-many-ancestors
+- unrecognized-inline-option
+arista/components/denali/supervisor.py:
+- unused-import
+arista/components/dpm/ucd.py:
+- bad-indentation
+- not-context-manager
+- unused-argument
+arista/components/eeprom.py:
+- unused-argument
+arista/components/microsemi.py:
+- line-too-long
+arista/components/pca9555.py:
+- arguments-differ
+- arguments-renamed
+arista/components/plx.py:
+- unused-argument
+- unused-import
+arista/components/psu/helper.py:
+- unused-import
+arista/components/scd.py:
+- singleton-comparison
+- too-many-public-methods
+- unspecified-encoding
+arista/core/asic.py:
+- invalid-envvar-default
+- unused-argument
+arista/core/card.py:
+- arguments-differ
+- no-else-return
+arista/core/cause.py:
+- unspecified-encoding
+- unused-import
+arista/core/component/__init__.py:
+- no-method-argument
+- unused-argument
+arista/core/component/component.py:
+- unused-argument
+arista/core/config.py:
+- unidiomatic-typecheck
+- unspecified-encoding
+arista/core/cooling.py:
+- inconsistent-return-statements
+- unspecified-encoding
+arista/core/daemon.py:
+- broad-except
+- import-outside-toplevel
+- unused-argument
+arista/core/desc.py:
+- bad-indentation
+arista/core/driver/__init__.py:
+- unspecified-encoding
+arista/core/driver/kernel/i2c.py:
+- unspecified-encoding
+arista/core/driver/kernel/sysfs.py:
+- bad-indentation
+- not-callable
+- trailing-newlines
+- unspecified-encoding
+- unused-argument
+- unused-import
+arista/core/exception.py:
+- trailing-newlines
+arista/core/fan.py:
+- unused-argument
+arista/core/fixed.py:
+- arguments-differ
+arista/core/hwapi.py:
+- undefined-variable
+arista/core/i2c_utils.py:
+- consider-using-with
+- unnecessary-comprehension
+- used-before-assignment
+arista/core/inventory.py:
+- too-many-public-methods
+- unused-import
+arista/core/log.py:
+- consider-using-with
+- global-statement
+- no-else-raise
+- raise-missing-from
+- redefined-outer-name
+- super-init-not-called
+- undefined-variable
+- unspecified-encoding
+- unused-argument
+- unused-import
+arista/core/metainventory.py:
+- super-init-not-called
+arista/core/pci.py:
+- not-callable
+- unspecified-encoding
+arista/core/platform.py:
+- global-statement
+- import-outside-toplevel
+arista/core/prefdl.py:
+- raise-missing-from
+- unspecified-encoding
+- unused-argument
+arista/core/provision.py:
+- unspecified-encoding
+arista/core/psu.py:
+- unused-argument
+arista/core/register.py:
+- bad-indentation
+arista/core/tests/cause.py:
+- unspecified-encoding
+arista/core/tests/cooling.py:
+- abstract-method
+- arguments-renamed
+- arguments-differ
+- unused-argument
+- unused-variable
+arista/core/tests/linecards.py:
+- unused-import
+arista/core/tests/mockchassis.py:
+- bad-super-call
+arista/core/tests/mockinv.py:
+- abstract-method
+arista/core/tests/platforms.py:
+- unused-argument
+- useless-return
+arista/core/tests/registers.py:
+- no-else-raise
+- unused-variable
+arista/core/tests/utils.py:
+- consider-using-with
+arista/core/thermal_control.py:
+- no-else-continue
+arista/core/utils.py:
+- consider-using-with
+- global-statement
+- import-outside-toplevel
+- keyword-arg-before-vararg
+- redefined-outer-name
+- unspecified-encoding
+- unused-import
+arista/core/version.py:
+- trailing-newlines
+arista/daemon/dpm.py:
+- attribute-defined-outside-init
+arista/daemon/led.py:
+- unused-argument
+- unused-import
+arista/daemon/mac.py:
+- unspecified-encoding
+arista/daemon/seu.py:
+- attribute-defined-outside-init
+arista/daemon/storage.py:
+- attribute-defined-outside-init
+- unspecified-encoding
+arista/descs/cause.py:
+- bad-indentation
+- trailing-newlines
+arista/descs/fan.py:
+- unused-argument
+arista/descs/psu.py:
+- bad-indentation
+arista/drivers/eeprom.py:
+- bad-indentation
+arista/drivers/pca9541.py:
+- unused-import
+arista/drivers/pca9555.py:
+- line-too-long
+- redefined-argument-from-local
+arista/drivers/plx.py:
+- arguments-renamed
+- arguments-differ
+- chained-comparison
+- no-else-return
+- not-callable
+- superfluous-parens
+- unused-import
+- unused-variable
+arista/drivers/pmbus.py:
+- unspecified-encoding
+- unused-argument
+arista/drivers/rpc.py:
+- unused-argument
+- unused-import
+arista/drivers/sbtsi.py:
+- abstract-method
+- unused-argument
+arista/drivers/scd/driver.py:
+- arguments-differ
+- unused-argument
+arista/drivers/xcvr.py:
+- unspecified-encoding
+arista/drivers/scd/watchdog.py:
+- unused-import
+arista/drivers/vrm/__init__.py:
+- trailing-newlines
+arista/inventory/__init__.py:
+- unused-argument
+arista/libs/config.py:
+- unspecified-encoding
+arista/libs/fs.py:
+- unspecified-encoding
+arista/libs/i2c.py:
+- trailing-newlines
+- unspecified-encoding
+arista/libs/onie.py:
+- global-statement
+arista/libs/pci.py:
+- bad-indentation
+- line-too-long
+- pointless-string-statement
+- trailing-newlines
+- try-except-raise
+- unspecified-encoding
+arista/libs/procfs.py:
+- global-statement
+- undefined-variable
+- unspecified-encoding
+arista/libs/pyshell.py:
+- forgotten-debug-statement
+- import-outside-toplevel
+arista/libs/python.py:
+- undefined-variable
+arista/libs/wait.py:
+- bad-indentation
+- redefined-builtin
+- super-init-not-called
+arista/platforms/chassis/tuba.py:
+- bad-indentation
+- missing-final-newline
+arista/platforms/chassis/yuba.py:
+- bad-indentation
+- missing-final-newline
+arista/platforms/cpu/hedgehog.py:
+- bad-indentation
+- unused-argument
+- unused-import
+arista/platforms/cpu/puffin.py:
+- unused-import
+arista/platforms/fabric/brooks.py:
+- abstract-method
+- too-many-ancestors
+arista/platforms/fabric/dragonfly.py:
+- abstract-method
+- too-many-ancestors
+arista/platforms/fabric/eldridge.py:
+- abstract-method
+- too-many-ancestors
+- trailing-newlines
+arista/platforms/linecard/clearwater.py:
+- too-many-ancestors
+- unused-argument
+- using-constant-test
+arista/platforms/linecard/clearwater2.py:
+- attribute-defined-outside-init
+- too-many-ancestors
+arista/platforms/linecard/wolverine.py:
+- attribute-defined-outside-init
+- too-many-ancestors
+arista/platforms/newport.py:
+- bad-indentation
+- unused-import
+arista/platforms/pikez.py:
+- bad-indentation
+- unused-import
+arista/platforms/supervisor/otterlake.py:
+- unused-import
+arista/platforms/upperlake.py:
+- line-too-long
+arista/platforms/woodleaf.py:
+- line-too-long
+arista/tests/selftest.py:
+- import-outside-toplevel
+- wrong-import-order
+arista/tests/testing.py:
+- consider-using-from-import
+arista/utils/rpc/api.py:
+- line-too-long
+- raise-missing-from
+arista/utils/rpc/client.py:
+- line-too-long
+arista/utils/rpc/server.py:
+- too-many-return-statements
+arista/utils/rpc/tests/api.py:
+- attribute-defined-outside-init
+- line-too-long
+- too-many-function-args
+arista/utils/rpc/tests/client.py:
+- line-too-long
+- protected-access
+- unused-argument
+arista/utils/sonic_eeprom.py:
+- raise-missing-from
+- unused-argument
+arista/utils/sonic_leds.py:
+- raise-missing-from
+- unspecified-encoding
+arista/utils/sonic_platform/chassis.py:
+- import-outside-toplevel
+- line-too-long
+- raise-missing-from
+- too-many-public-methods
+- unused-import
+arista/utils/sonic_platform/common.py:
+- global-statement
+- raise-missing-from
+arista/utils/sonic_platform/eeprom.py:
+- raise-missing-from
+- redefined-outer-name
+- trailing-newlines
+arista/utils/sonic_platform/event.py:
+- consider-using-with
+- unspecified-encoding
+arista/utils/sonic_platform/fan.py:
+- raise-missing-from
+arista/utils/sonic_platform/fan_drawer.py:
+- raise-missing-from
+- unused-argument
+arista/utils/sonic_platform/module.py:
+- attribute-defined-outside-init
+- raise-missing-from
+- unused-argument
+arista/utils/sonic_platform/pcie.py:
+- bare-except
+- protected-access
+- raise-missing-from
+- unused-import
+- unused-variable
+arista/utils/sonic_platform/platform.py:
+- raise-missing-from
+- unused-import
+arista/utils/sonic_platform/psu.py:
+- bad-indentation
+- line-too-long
+- raise-missing-from
+- too-many-public-methods
+- unused-argument
+arista/utils/sonic_platform/sfp.py:
+- import-outside-toplevel
+- no-else-return
+- raise-missing-from
+- too-many-public-methods
+- unused-import
+arista/utils/sonic_platform/sfp_optoe.py:
+- import-error
+- wrong-import-order
+arista/utils/sonic_platform/thermal.py:
+- raise-missing-from
+- unused-argument
+arista/utils/sonic_platform/thermal_action.py:
+- line-too-long
+- raise-missing-from
+- super-init-not-called
+- unnecessary-pass
+arista/utils/sonic_platform/thermal_condition.py:
+- raise-missing-from
+- unnecessary-pass
+- unused-argument
+arista/utils/sonic_platform/thermal_info.py:
+- protected-access
+- raise-missing-from
+- super-init-not-called
+arista/utils/sonic_platform/thermal_manager.py:
+- raise-missing-from
+- unnecessary-pass
+- unused-wildcard-import
+- wildcard-import
+arista/utils/sonic_platform/watchdog.py:
+- raise-missing-from
+arista/utils/sonic_psu.py:
+- raise-missing-from
+arista/utils/sonic_reboot.py:
+- bare-except
+- line-too-long
+- unused-import
+arista/utils/sonic_sfputil.py:
+- bad-indentation
+- bare-except
+- raise-missing-from
+arista/utils/sonic_utils.py:
+- redefined-outer-name
+- simplifiable-if-expression
+- unspecified-encoding
+- unused-import

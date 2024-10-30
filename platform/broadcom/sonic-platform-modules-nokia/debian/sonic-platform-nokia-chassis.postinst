@@ -1,0 +1,7 @@
+systemctl enable nokia-watchdog.service
+systemctl start nokia-watchdog.service
+
+systemctl enable openbdb.service
+systemctl start openbdb.service
+
+/usr/local/bin/nokia_install_ndk_service

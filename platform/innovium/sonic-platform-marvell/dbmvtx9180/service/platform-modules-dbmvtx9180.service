@@ -1,0 +1,14 @@
+[Unit]
+Description=Marvell Dbmvtx9180 Platform modules
+Before=pmon.service
+After=sysinit.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/marvell_dbmvtx9180_util.py install
+ExecStop=/usr/local/bin/marvell_dbmvtx9180_util.py clean
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

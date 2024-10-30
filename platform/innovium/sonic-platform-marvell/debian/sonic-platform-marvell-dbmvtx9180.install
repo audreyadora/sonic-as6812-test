@@ -1,0 +1,4 @@
+dbmvtx9180/scripts/dbmvtx9180-init.sh  usr/local/bin
+dbmvtx9180/service/platform-modules-dbmvtx9180.service etc/systemd/system
+dbmvtx9180/cfg/dbmvtx9180.conf etc/modules-load.d
+dbmvtx9180/sonic_platform-1.0-py3-none-any.whl usr/share/sonic/device/x86_64-marvell_dbmvtx9180-r0

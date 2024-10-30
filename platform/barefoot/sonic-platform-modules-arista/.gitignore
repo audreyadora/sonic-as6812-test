@@ -1,0 +1,42 @@
+# kernel module build
+*.a
+*.o
+*.so
+*.o.d
+*.ko
+*.mod
+*.mod.c
+*.mod.o
+*.cmd
+Module.symvers
+modules.order
+
+# libs
+/lib/sfp-eeprom.inc
+
+# debian packaging
+*.debhelper
+*.log
+DEBIAN
+.tmp_versions
+.finished.build
+*.substvars
+
+# python
+*.pyc
+__pycache__/
+/build
+/*.egg-info
+/venv*
+/.pybuild
+/.eggs/
+/.pytest_cache/
+
+# package related rules
+/install/
+/debian/files
+/debian/drivers-sonic-platform-arista/
+/debian/python-sonic-platform-arista/
+/debian/python3-sonic-platform-arista/
+/debian/sonic-platform-arista/
+/arista/__version__.py

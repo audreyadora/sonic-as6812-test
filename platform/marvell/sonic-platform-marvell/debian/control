@@ -1,0 +1,37 @@
+Source: sonic-platform-marvell
+Section: main
+Priority: optional
+Maintainer: Marvell
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.6
+
+Package: sonic-platform-rd98dx35xx-cn9131
+Architecture: any
+Depends: ${misc:Depends}
+Description: Provides kernel modules and platform monitoring files
+
+Package: sonic-platform-rd98dx35xx
+Architecture: any
+Depends: ${misc:Depends}
+Description: Provides kernel modules and platform monitoring files
+
+Package: sonic-platform-rd98dx35xx-x86
+Architecture: any
+Depends: ${misc:Depends}
+Description: Provides kernel modules and platform monitoring files
+
+Package: sonic-platform-db98cx8580-32cd
+Architecture: any
+Depends: ${misc:Depends}
+Description: Provides kernel modules and platform monitoring files
+
+Package: sonic-platform-db98cx8540-16cd
+Architecture: any
+Depends: ${misc:Depends}
+Description: Provides kernel modules and platform monitoring files
+
+Package: sonic-platform-db98cx8514-10cc
+Architecture: any
+Depends: ${misc:Depends}
+Description: Provides kernel modules and platform monitoring files
+

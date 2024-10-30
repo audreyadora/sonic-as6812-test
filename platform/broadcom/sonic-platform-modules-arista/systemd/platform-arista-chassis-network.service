@@ -1,0 +1,16 @@
+[Unit]
+Description=Early network configuration for Arista chassis
+Before=database-chassis.service
+Before=platform-arista-linecard.service
+PartOf=platform-arista.target
+ConditionKernelCommandLine=Aboot
+ConditionKernelCommandLine=sonic.mode=supervisor
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+
+ExecStart=/usr/bin/arista-chassis-network start
+
+[Install]
+RequiredBy=platform-arista.target

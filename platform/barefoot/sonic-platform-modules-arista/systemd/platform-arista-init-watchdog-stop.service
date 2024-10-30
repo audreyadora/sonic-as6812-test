@@ -1,0 +1,16 @@
+[Unit]
+Description=Disable the watchdog after platform initialization
+After=swss.service
+After=opennsl-modules.service
+PartOf=platform-arista.target
+ConditionKernelCommandLine=Aboot
+ConditionKernelCommandLine=sid=Gardena
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+
+ExecStart=/usr/bin/arista watchdog --stop
+
+[Install]
+RequiredBy=platform-arista.target

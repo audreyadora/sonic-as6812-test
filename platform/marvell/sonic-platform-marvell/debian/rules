@@ -1,0 +1,112 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+include /usr/share/dpkg/pkg-info.mk
+#--------------------------------------------------------
+
+ifneq ($(CROSS_BUILD_ENVIRON), y)
+KVERSION   ?= $(shell uname -r)
+endif
+KERNEL_SRC :=  /lib/modules/$(KVERSION)
+INSTALL_MOD_DIR := kernel/extra/
+MOD_SRC_DIR:= $(shell pwd)
+MODULE_DIRS:= rd98dx35xx_cn9131 rd98dx35xx rd98dx35xx-x86 db98cx8580-32cd db98cx8514-10cc db98cx8540-16cd
+UTILS_DIR := utils
+SERVICE_DIR := service
+MRVL_MODULE_DIR:= mrvl-modules
+PRESTERA_MODULE_PREFIX := mrvl-prestera/drivers/generic/
+PRESTERA_MODULE_SRC := cpssEnabler/linuxNoKernelModule/drivers/
+
+%:
+	dh $@ --with systemd,python3 --buildsystem=pybuild
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean
+	(for mod in $(MODULE_DIRS); do \
+		cd $(MOD_SRC_DIR)/$${mod}; \
+		rm -rf build/; \
+		rm -rf mrvl-modules/; \
+		rm -rf *.egg-info/; \
+		rm -f *.whl; \
+		cd $(MOD_SRC_DIR)/; \
+	done)
+
+build:
+	(for mod in $(MODULE_DIRS); do \
+		mkdir -p $(MOD_SRC_DIR)/$${mod}/$(MRVL_MODULE_DIR); \
+		cp -r $(MOD_SRC_DIR)/../$(PRESTERA_MODULE_PREFIX)/* $(MOD_SRC_DIR)/$${mod}/$(MRVL_MODULE_DIR)/; \
+		cd $(MOD_SRC_DIR)/$${mod}/$(MRVL_MODULE_DIR)/$(PRESTERA_MODULE_SRC); \
+		make clean; \
+		if [ $$mod = "rd98dx35xx_cn9131" ]; then \
+			make modules -C $(KERNEL_SRC)/build M=`pwd` CONFIG_KM_MVPCI=y CONFIG_KM_MVINT=y || exit 1; \
+        elif [ $$mod = "rd98dx35xx-x86" ];then \
+			make modules -C $(KERNEL_SRC)/build M=`pwd` CONFIG_KM_MVPCI=y CONFIG_KM_MVINT=y CONFIG_KM_MVDMA2=y|| exit 1; \
+		elif [ $$mod = "rd98dx35xx" ]; then \
+			make modules -C $(KERNEL_SRC)/build M=`pwd` CONFIG_KM_MVMBUS=y CONFIG_KM_MVINT=y || exit 1; \
+		elif [ $$mod = "db98cx8580-32cd" ]; then \
+			make modules -C $(KERNEL_SRC)/build M=`pwd` CONFIG_KM_MVPCI=y CONFIG_KM_MVINT=y CONFIG_KM_MVDMA2=y CONFIG_KM_MVETH=y || exit 1; \
+		elif [ $$mod = "db98cx8514-10cc" ]; then \
+			make modules -C $(KERNEL_SRC)/build M=`pwd` CONFIG_KM_MVPCI=y CONFIG_KM_MVINT=y CONFIG_KM_MVDMA2=y CONFIG_KM_MVETH=y || exit 1; \
+		elif [ $$mod = "db98cx8540-16cd" ]; then \
+			make modules -C $(KERNEL_SRC)/build M=`pwd` CONFIG_KM_MVPCI=y CONFIG_KM_MVINT=y CONFIG_KM_MVDMA2=y CONFIG_KM_MVETH=y || exit 1; \
+		fi; \
+		cd $(MOD_SRC_DIR)/$${mod}; \
+		python3 setup.py build; \
+		python3 setup.py bdist_wheel -d $(MOD_SRC_DIR)/$${mod}; \
+		cd $(MOD_SRC_DIR); \
+	done)
+
+
+binary: binary-arch binary-indep
+	# Nothing to do
+
+binary-arch:
+	# Nothing to do
+
+binary-indep:
+	dh_testdir
+	dh_installdirs
+
+	# Custom package commands
+	(for mod in $(MODULE_DIRS); do \
+		if [ $$mod = "rd98dx35xx_cn9131" ]; then \
+			pkg="rd98dx35xx-cn9131"; \
+		else \
+			pkg=$$mod; \
+		fi; \
+		dh_installdirs -psonic-platform-$${pkg} /$(KERNEL_SRC)/$(INSTALL_MOD_DIR); \
+		dh_installdirs -psonic-platform-$${pkg} /usr/local/bin; \
+		cp $(MOD_SRC_DIR)/$${mod}/$(UTILS_DIR)/* debian/sonic-platform-$${pkg}/usr/local/bin/; \
+		cp $(MOD_SRC_DIR)/$${mod}/$(MRVL_MODULE_DIR)/$(PRESTERA_MODULE_SRC)/mvcpss.ko debian/sonic-platform-$${pkg}/$(KERNEL_SRC)/$(INSTALL_MOD_DIR); \
+        if [ $$mod = "db98cx8580-32cd" ] || \
+           [ $$mod = "db98cx8514-10cc" ] || \
+           [ $$mod = "db98cx8540-16cd" ]; then \
+            cp $(MOD_SRC_DIR)/$${mod}/$(MRVL_MODULE_DIR)/$(PRESTERA_MODULE_SRC)/mvSai.ko debian/sonic-platform-$${pkg}/$(KERNEL_SRC)/$(INSTALL_MOD_DIR); \
+        fi; \
+		cd $(MOD_SRC_DIR)/$${mod}; \
+		python3 setup.py install --root=$(MOD_SRC_DIR)/debian/sonic-platform-$${pkg} --install-layout=deb; \
+		cd $(MOD_SRC_DIR); \
+	done)
+
+	# Resuming debhelper scripts
+	dh_testroot
+	dh_install
+	dh_installchangelogs
+	dh_installdocs
+	dh_systemd_enable
+	dh_installinit
+	dh_systemd_start
+	dh_link
+	dh_fixperms
+	dh_compress
+	dh_strip
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+.PHONY: build binary binary-arch binary-indep clean

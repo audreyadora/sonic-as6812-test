@@ -1,0 +1,6 @@
+[Unit]
+Description=Arista Platform
+
+[Install]
+Alias=sonic-platform-arista.target
+WantedBy=multi-user.target

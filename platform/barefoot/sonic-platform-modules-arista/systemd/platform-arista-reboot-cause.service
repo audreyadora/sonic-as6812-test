@@ -1,0 +1,16 @@
+[Unit]
+Description=Arista reboot cause processing
+After=platform-arista-pmon.service
+Requires=platform-arista-pmon.service
+Before=process-reboot-cause.service determine-reboot-cause.service
+PartOf=platform-arista.target
+ConditionKernelCommandLine=Aboot
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+
+ExecStart=/usr/bin/arista -l /var/log/arista.log reboot-cause --process
+
+[Install]
+RequiredBy=platform-arista.target

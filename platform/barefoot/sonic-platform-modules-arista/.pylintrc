@@ -1,0 +1,54 @@
+[MASTER]
+profile=no
+persistent=no
+
+[MESSAGES CONTROL]
+disable-checker=Design,Similarities
+disable=invalid-name,
+        missing-docstring,
+        duplicate-code,
+        too-few-public-methods,
+        bad-continuation,
+        no-self-use,
+        fixme,
+        no-absolute-import,
+        superfluous-parens,
+        too-many-ancestors,
+        too-many-arguments,
+        too-many-statements,
+        too-many-locals,
+        too-many-instance-attributes,
+        too-many-branches,
+        unnecessary-lambda-assignment,
+        unnecessary-pass,
+        consider-using-f-string,
+        useless-object-inheritance,
+        super-with-arguments,
+        no-member,
+
+        # Compatibility with pylint from older Debian releases
+        unrecognized-option,
+        useless-option-value,
+
+[BASIC]
+bad-functions=apply,input
+
+[TYPECHECK]
+ignored-classes=RegisterMap,FakeRegisterMap
+
+[VARIABLES]
+dummy-variables-rgx=_
+
+[CLASSES]
+defining-attr-methods=__init__,
+                      __new__,
+                      setUp,
+                      setup_method,
+
+[MISCELLANEOUS]
+notes=FIXME,XXX,TODO
+
+[FORMAT]
+max-line-length=85
+indent-string='   '
+indent-after-paren=3

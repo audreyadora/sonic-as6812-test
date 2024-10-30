@@ -1,0 +1,7 @@
+db98cx8580-32cd/scripts/db98cx8580-32cd-init.sh  usr/local/bin
+db98cx8580-32cd/service/db98cx8580-32cd-init.service etc/systemd/system
+db98cx8580-32cd/sonic_platform-1.0-py3-none-any.whl usr/share/sonic/device/x86_64-marvell_db98cx8580_32cd-r0
+../mrvl-prestera/platform/amd64/common/* /
+../mrvl-prestera/platform/amd64/98cx8580/* /
+
+

@@ -1,0 +1,53 @@
+#!/usr/bin/python3
+
+import re
+import sys
+import yaml
+
+MODULE_RE = re.compile(r'\*{13} Module (.+)')
+WARNING_RE = re.compile(r'(?P<filename>[^:]+):(?P<line>\d+):(?P<column>\d+):' +
+                        r' (?P<code>[A-Z]\d{4}): .+ \((?P<slug>[a-z-]+)\)')
+
+def print_module_warnings(module, warnings):
+   print('*' * 13, 'Module', module)
+   for warning in warnings:
+      print(warning, end='')
+
+def main():
+   module = None
+   warnings = []
+   excludes = {}
+   have_unfiltered_warning = False
+
+   with open('.pylint_excludes.yml', 'r', encoding='utf-8') as f:
+      excludes = yaml.safe_load(f)
+
+   for line in sys.stdin:
+      m = MODULE_RE.match(line)
+      if m:
+         # If we've processed a previous module, output it now.
+         if module and warnings:
+            print_module_warnings(module, warnings)
+            have_unfiltered_warning = True
+         module = m.group(1)
+         warnings = []
+         continue
+
+      m = WARNING_RE.match(line)
+      if m:
+         fn = m.group('filename')
+         if fn not in excludes or m.group('slug') not in excludes[fn]:
+            warnings.append(line)
+         continue
+
+      print(line, end='')
+
+   # Print warnings for the last module
+   if module and warnings:
+      print_module_warnings(module, warnings)
+
+   if have_unfiltered_warning:
+      sys.exit(1)
+
+if __name__ == '__main__':
+   main()

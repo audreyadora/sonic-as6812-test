@@ -1,0 +1,27 @@
+#!/usr/bin/python3
+
+from collections import defaultdict
+import re
+import sys
+import yaml
+from yaml.representer import Representer
+
+WARNING_RE = re.compile(r'(?P<filename>[^:]+):(?P<line>\d+):(?P<column>\d+): ' +
+                        r'(?P<code>[A-Z]\d{4}): .+ \((?P<slug>[a-z-]+)\)')
+
+def main():
+   excludes = defaultdict(set)
+
+   for line in sys.stdin:
+      m = WARNING_RE.match(line)
+      if m:
+         excludes[m.group('filename')].add(m.group('slug'))
+
+   with open('.pylint_excludes.yml', 'w', encoding='utf-8') as f:
+      yaml.add_representer(defaultdict, Representer.represent_dict)
+      yaml.add_representer(set,
+         lambda dumper, data: dumper.represent_list(sorted(data)))
+      yaml.dump(excludes, f)
+
+if __name__ == '__main__':
+   main()

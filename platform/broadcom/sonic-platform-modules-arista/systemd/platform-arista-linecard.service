@@ -1,0 +1,17 @@
+[Unit]
+Description=Arista linecard support
+After=platform-arista-fabric.service
+Requires=platform-arista-fabric.service
+PartOf=platform-arista.target
+ConditionKernelCommandLine=Aboot
+ConditionKernelCommandLine=sonic.mode=supervisor
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+
+ExecStart=/usr/bin/arista -l /var/log/arista-linecard.log linecard --parallel setup --lcpu --on --powerCycleIfOn
+ExecStop=/usr/bin/arista -l /var/log/arista-linecard.log linecard --parallel clean --lcpu --off
+
+[Install]
+RequiredBy=platform-arista.target

@@ -1,0 +1,78 @@
+#!/bin/bash
+
+VLAN_ID=42
+
+config_lo() {
+   echo "Chassis loopback configuration"
+   ip addr add 127.0.0.1/16 dev lo
+   ip addr del 127.0.0.1/8 dev lo
+}
+
+setup_mgmt() {
+   echo "Setting up management bridge"
+
+   if [ -d /sys/class/net/eth0 ] && [ -d /sys/class/net/ma1 ]; then
+      echo "eth0 and ma1 already exist, doing nothing..."
+      return
+   fi
+
+   mgmt_mac_addr=$(cat /sys/class/net/eth0/address)
+
+   # Make sure the interface is down before renaming it
+   ip link set dev eth0 down
+
+   # Rename real management port to ma1
+   ip link set dev eth0 name ma1
+
+   # Create management bridge eth0 and put ma1 in it
+   ip link add name eth0 type bridge
+   ip link set dev eth0 address "$mgmt_mac_addr"
+   ip link set dev ma1 master eth0
+
+   # Bring everything up
+   ip link set dev ma1 up
+   ip link set dev eth0 up
+}
+
+setup_br1() {
+   echo "Setting up br1"
+
+   if [ -d /sys/class/net/br1 ]; then
+      echo "br1 already exists, doing nothing..."
+      return
+   fi
+
+   ip link add name br1 type bridge
+   ip link set dev br1 up
+   echo 1 > /proc/sys/net/ipv4/conf/br1/route_localnet
+   ip addr add 127.100.1.1/16 dev br1
+}
+
+start_chassis_network() {
+   config_lo
+   setup_mgmt
+   setup_br1
+}
+
+stop_chassis_network() {
+   ip link del dev br1
+   ip link del dev eth0
+   ip link set dev ma1 down
+   ip link set dev ma1 name eth0
+   ip link set dev eth0 up
+}
+
+case "$1" in
+   start)
+      start_chassis_network
+      ;;
+   stop)
+      stop_chassis_network
+      ;;
+   lo)
+      config_lo
+      ;;
+   *)
+      exit 1
+      ;;
+esac

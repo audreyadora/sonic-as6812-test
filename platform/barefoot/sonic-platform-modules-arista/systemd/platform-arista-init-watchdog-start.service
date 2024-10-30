@@ -1,0 +1,20 @@
+[Unit]
+Description=Enable the watchdog before platform initialization
+Before=platform-arista-swss.service
+PartOf=platform-arista.target
+ConditionKernelCommandLine=Aboot
+ConditionKernelCommandLine=sid=Gardena
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+
+ExecStart=-/bin/bash -c ' \
+    if ! systemctl is-active swss && systemctl is-enabled swss; then \
+        timeout=600; \
+        echo "Enabling watchdog for $timeout seconds"; \
+        /usr/bin/arista watchdog --arm "$timeout"; \
+    fi'
+
+[Install]
+RequiredBy=platform-arista.target

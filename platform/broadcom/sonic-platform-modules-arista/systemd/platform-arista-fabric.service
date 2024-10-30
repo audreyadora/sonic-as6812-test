@@ -1,0 +1,20 @@
+[Unit]
+Description=Arista fabric support
+Before=syncd@.service
+Before=opennsl-modules.service
+After=platform-arista-pmon.service
+Requires=platform-arista-pmon.service
+PartOf=platform-arista.target
+ConditionKernelCommandLine=Aboot
+ConditionKernelCommandLine=sonic.mode=supervisor
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+
+ExecStart=/usr/bin/arista -l /var/log/arista-fabric.log fabric --parallel setup --on --powerCycleIfOn
+
+ExecStop=/usr/bin/arista -l /var/log/arista-fabric.log fabric --parallel clean
+
+[Install]
+RequiredBy=platform-arista.target

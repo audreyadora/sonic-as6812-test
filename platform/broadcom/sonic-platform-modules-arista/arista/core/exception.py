@@ -1,0 +1,4 @@
+
+class UnknownPlatformError(Exception):
+   pass
+

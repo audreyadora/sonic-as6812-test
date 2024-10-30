@@ -1,0 +1,5 @@
+db98cx8514-10cc/scripts/db98cx8514-10cc-init.sh  usr/local/bin
+db98cx8514-10cc/service/db98cx8514-10cc-init.service etc/systemd/system
+db98cx8514-10cc/sonic_platform-1.0-py3-none-any.whl usr/share/sonic/device/x86_64-marvell_db98cx8514_10cc-r0
+../mrvl-prestera/platform/amd64/common/* /
+../mrvl-prestera/platform/amd64/98cx8514/* /
